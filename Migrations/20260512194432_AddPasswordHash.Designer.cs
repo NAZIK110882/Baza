@@ -3,6 +3,7 @@ using Baza.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Baza.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512194432_AddPasswordHash")]
+    partial class AddPasswordHash
     {
-        protected override void BuildModel(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
