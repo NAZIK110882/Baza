@@ -35,6 +35,12 @@ namespace Baza.Services
             var keyString = _configuration["Jwt:Key"]; 
             if (string.IsNullOrEmpty(keyString)) return null;
 
+            if (player == null)
+            {
+                _logger.LogWarning($"Невдала спроба входу: користувача {dto.Nickname} не знайдено.");
+                return null;
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
