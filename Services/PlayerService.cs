@@ -9,10 +9,12 @@ namespace Baza.Services
     public class PlayerService : IPlayerService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<PlayerService> _logger;
 
-        public PlayerService(ApplicationDbContext context)
+        public PlayerService(ApplicationDbContext context, ILogger<PlayerService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<List<PlayerResponseDto>> GetAllPlayersAsync()
@@ -45,7 +47,7 @@ namespace Baza.Services
 
         public async Task<PlayerResponseDto> CreatePlayerAsync(RegisterPlayerDto dto)
         {
-
+            _logger.LogInformation($"Реєстрація нового гравця: {dto.Nickname}");
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
             var player = new Player
@@ -73,6 +75,26 @@ namespace Baza.Services
 
             // Перевіряємо, чи введений пароль відповідає хешу в базі
             return BCrypt.Net.BCrypt.Verify(password, player.PasswordHash);
+        }
+
+        public async Task<bool> UpdateScoreAsync(int id, int newScore)
+        {
+            var player = await _context.Players.FindAsync(id);
+            if (player == null) return false;
+
+            player.Score = newScore;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeletePlayerAsync(int id)
+        {
+            var player = await _context.Players.FindAsync(id);
+            if (player == null) return false;
+
+            _context.Players.Remove(player);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
