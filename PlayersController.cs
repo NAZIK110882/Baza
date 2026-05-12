@@ -1,57 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Baza.Data;
+using Baza.Models.DTOs; // Підключаємо наші конверти-DTO
+using Baza.Services;
 
 namespace Baza.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PlayersController : ControllerBase
+    public class PlayerController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPlayerService _playerService;
 
-        public PlayersController(ApplicationDbContext context)
+        public PlayerController(IPlayerService playerService)
         {
-            _context = context;
+            _playerService = playerService;
         }
 
-        
+        // Отримати всіх (повертаємо список DTO)
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Player>>> GetPlayers()
+        public async Task<ActionResult<List<PlayerResponseDto>>> GetPlayers()
         {
-            return await _context.Players.OrderByDescending(p => p.Score).ToListAsync();
+            var players = await _playerService.GetAllPlayersAsync();
+            return Ok(players);
         }
 
-        
-        [HttpPost("login")]
-        public async Task<ActionResult<Player>> Login([FromBody] string nickname)
+        // Отримати одного за ID (повертаємо DTO)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PlayerResponseDto>> GetPlayer(int id)
         {
-            
-            var player = await _context.Players
-                .FirstOrDefaultAsync(p => p.Nickname == nickname);
+            var player = await _playerService.GetPlayerByIdAsync(id);
 
             if (player == null)
             {
-                player = new Player
-                {
-                    Nickname = nickname,
-                    Score = 0
-                };
-
-                _context.Players.Add(player);
-                await _context.SaveChangesAsync();
+                return NotFound("Гравця не знайдено в Dirty 21");
             }
 
             return Ok(player);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Player>> PostPlayer(Player player)
+        // Реєстрація (приймаємо RegisterPlayerDto)
+        [HttpPost("register")]
+        public async Task<ActionResult<PlayerResponseDto>> Register(RegisterPlayerDto dto)
         {
-            _context.Players.Add(player);
-            await _context.SaveChangesAsync();
-
-            return Ok(player);
+            var result = await _playerService.CreatePlayerAsync(dto);
+            return Ok(result);
         }
     }
 }
