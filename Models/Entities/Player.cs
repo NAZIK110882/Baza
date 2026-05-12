@@ -4,7 +4,9 @@
     {
         public int Id { get; set; }
         public string Nickname { get; set; } = string.Empty;
+
+        public string PasswordHash { get; set; } = string.Empty;
+
         public int Score { get; set; }
-        public string? PasswordHash { get; set; }
     }
 }

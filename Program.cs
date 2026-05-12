@@ -19,6 +19,7 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 
 
 var app = builder.Build();
+app.UseMiddleware<Baza.Middleware.ExceptionMiddleware>();
 
 
 if (app.Environment.IsDevelopment())
